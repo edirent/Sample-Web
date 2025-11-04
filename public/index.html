@@ -201,27 +201,36 @@
     <p class="footer__legal">© <span id="year"></span> TAQA Water Solutions. All rights reserved.</p>
   </footer>
 
-  <div class="floating-chat" data-state="open">
-    <header>
-      <div class="floating-chat__title">
-        <div class="floating-chat__text">
-          <strong>TAQA Water Desk</strong>
-          <span>Always-on support</span>
-        </div>
-      </div>
-      <button id="chatToggle" aria-label="Minimize chat" title="Minimize chat">-</button>
-    </header>
-      <iframe
-        src="http://localhost:9222/next-chats/share?shared_id=7e7c6a1eb8a911f0bfa2fe86832eb25e&amp;from=chat&amp;auth=hjNGQ1NTJjYjhhNDExZjBiNjdlZmU4Nj"
-        title="TAQA Water Chat"
-        allow="clipboard-read; clipboard-write"
-        loading="lazy"
-      ></iframe>
-  </div>
+  <iframe
+    src="http://localhost:9222/next-chats/widget?shared_id=7e7c6a1eb8a911f0bfa2fe86832eb25e&amp;from=chat&amp;auth=hjNGQ1NTJjYjhhNDExZjBiNjdlZmU4Nj&amp;visible_avatar=1&amp;mode=master&amp;streaming=false"
+    style="position:fixed;bottom:0;right:0;width:100px;height:100px;border:none;background:transparent;z-index:9999"
+    frameborder="0"
+    allow="microphone;camera"
+  ></iframe>
+  <script>
+    window.addEventListener("message", (event) => {
+      if (event.origin !== "http://localhost:9222") return;
 
-  <button id="chatLauncher" class="chat-launcher" aria-label="Open chat" title="Open chat">
-    <span>Chat with TAQA</span>
-  </button>
+      if (event.data.type === "CREATE_CHAT_WINDOW") {
+        if (document.getElementById("chat-win")) return;
+        const iframe = document.createElement("iframe");
+        iframe.id = "chat-win";
+        iframe.src = event.data.src;
+        iframe.style.cssText =
+          "position:fixed;bottom:104px;right:24px;width:380px;height:500px;border:none;background:transparent;z-index:9998;display:none";
+        iframe.frameBorder = "0";
+        iframe.allow = "microphone;camera";
+        document.body.appendChild(iframe);
+      } else if (event.data.type === "TOGGLE_CHAT") {
+        const chatWindow = document.getElementById("chat-win");
+        if (chatWindow) {
+          chatWindow.style.display = event.data.isOpen ? "block" : "none";
+        }
+      } else if (event.data.type === "SCROLL_PASSTHROUGH") {
+        window.scrollBy(0, event.data.deltaY);
+      }
+    });
+  </script>
 
   <script src="script.js"></script>
 </body>
